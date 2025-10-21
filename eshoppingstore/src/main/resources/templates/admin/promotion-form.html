@@ -1,1 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit Promotion</title>
+    <style>
+        body {
+            margin:0;
+            font-family:Inter,system-ui,Arial;
+            background:#0b1020;
+            color:#e7ecff;
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+        }
+        .wrap { flex:1; max-width:900px; margin:0 auto; padding:26px }
+        .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px }
+        .btn {
+            padding:10px 14px;
+            border-radius:10px;
+            border:1px solid rgba(255,255,255,.12);
+            background:#121936;
+            cursor:pointer;
+            text-decoration:none;
+            color:#e7ecff;
+        }
+        .btn:hover { filter:brightness(1.15) }
+        .card {
+            background:linear-gradient(180deg,#111736,#0f152a);
+            border:1px solid rgba(255,255,255,.08);
+            border-radius:16px;
+            box-shadow:0 10px 30px rgba(0,0,0,.25);
+            padding:24px
+        }
+        h1 { margin-bottom:16px }
+        .grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start }
+        .grid > div { display:flex; flex-direction:column; width:100% }
+        .grid label { font-size:13px; opacity:.85; margin-bottom:6px }
+        input,textarea {
+            width:100%; padding:10px;
+            border-radius:10px;
+            background:#131938;
+            border:1px solid rgba(255,255,255,.12);
+            color:#e7ecff;
+        }
+        textarea { min-height:100px }
+        .full { grid-column:1 / -1 }
+        .row { display:flex; gap:10px; justify-content:flex-end; margin-top:16px }
+        footer {
+            text-align:center;
+            padding:20px;
+            color:#9ca3af;
+            margin-top:auto;
+        }
+        .toggle-btn {
+            padding:8px 16px;
+            border:none;
+            border-radius:20px;
+            background:#444a66;
+            color:#fff;
+            cursor:pointer;
+            font-weight:600;
+            transition:all 0.3s;
+            width:120px;
+            text-align:center;
+        }
+        .toggle-btn.active {
+            background:linear-gradient(90deg,#34d399,#059669);
+            color:#0b1020;
+        }
+
+        /* Modern Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #444a66;
+            border-radius: 26px;
+            transition: .3s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; width: 18px;
+            left: 4px; bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .3s;
+        }
+        input:checked + .slider {
+            background: linear-gradient(90deg,#f43f5e,#e11d48);
+        }
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+    </style>
+    <script>
+        function toggleActive(btn){
+            const hidden = btn.nextElementSibling;
+            if(btn.classList.contains("active")){
+                btn.classList.remove("active");
+                btn.textContent="Inactive";
+                hidden.value="false";
+            } else {
+                btn.classList.add("active");
+                btn.textContent="Active";
+                hidden.value="true";
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="wrap">
+    <div class="top">
+        <div>
+            <a href="/Promotions" class="btn">← Back to Promotions</a>
+            <a href="/admin/promotions" class="btn">Back to Admin</a>
+        </div>
+        <a th:href="@{/logout}" class="btn">Logout</a>
+    </div>
+
+    <h1>Edit Promotion</h1>
+
+    <div class="card">
+        <!-- enctype added for file upload -->
+        <form th:action="@{'/admin/promotions/' + ${promotion.id}}"
+              th:object="${promotion}"
+              method="post"
+              enctype="multipart/form-data">
+
+            <div class="grid">
+                <div>
+                    <label>Name</label>
+                    <input type="text" th:field="*{name}" required />
+                </div>
+                <div>
+                    <label>Promo Code</label>
+                    <input type="text" th:field="*{promoCode}" />
+                </div>
+                <div>
+                    <label>Discount %</label>
+                    <input type="number" th:field="*{discountPercent}" min="0" max="100" />
+                </div>
+                <div>
+                    <label>Priority</label>
+                    <input type="number" th:field="*{priority}" min="1" max="5" required />
+                </div>
+                <div>
+                    <label>Start Date</label>
+                    <input type="date" th:field="*{startDate}" />
+                </div>
+                <div>
+                    <label>End Date</label>
+                    <input type="date" th:field="*{endDate}" />
+                </div>
+
+                <!-- Image Upload -->
+                <div class="full">
+                    <label>Upload Banner Image</label>
+                    <input type="file" name="imageFile" accept="image/*" />
+
+                    <!-- Show existing uploaded image (DB) -->
+                    <div th:if="${promotion.id != null and promotion.bannerImage != null}" style="margin-top:10px;">
+                        <p>Current Image:</p>
+                        <img th:src="@{'/admin/promotions/' + ${promotion.id} + '/image'}"
+                             alt="Current Banner"
+                             style="max-width:100%;border-radius:10px;">
+
+                        <!-- Modern Remove Image Toggle -->
+                        <div style="margin-top:12px; display:flex; align-items:center; gap:10px;">
+                            <label class="switch">
+                                <input type="checkbox" name="removeImage"/>
+                                <span class="slider"></span>
+                            </label>
+                            <span style="font-size:14px;opacity:0.9;">Remove Image</span>
+                        </div>
+                    </div>
+
+                    <!-- Show existing URL-based image -->
+                    <div th:if="${promotion.bannerImage == null and promotion.bannerImageUrl != null}" style="margin-top:10px;">
+                        <p>Current Image (URL):</p>
+                        <img th:src="${promotion.bannerImageUrl}"
+                             alt="Current Banner"
+                             style="max-width:100%;border-radius:10px;">
+                    </div>
+                </div>
+
+                <!-- URL fallback -->
+                <div class="full">
+                    <label>Or Banner Image URL</label>
+                    <input type="url" th:field="*{bannerImageUrl}" placeholder="https://..."
+                           th:value="${promotion.bannerImageUrl}" />
+                </div>
+
+                <div class="full">
+                    <label>Description</label>
+                    <textarea th:field="*{description}"></textarea>
+                </div>
+
+                <!-- Toggle Active -->
+                <div class="full">
+                    <label>Active?</label>
+                    <button type="button"
+                            class="toggle-btn"
+                            th:classappend="${promotion.active} ? ' active' : ''"
+                            th:text="${promotion.active} ? 'Active' : 'Inactive'"
+                            onclick="toggleActive(this)">Inactive</button>
+                    <input type="hidden" th:field="*{active}" />
+                </div>
+            </div>
+            <div class="row">
+                <button type="submit" class="btn">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer>
+    © 2025 LankaBuy — Marketing & Promotions
+</footer>
+</body>
+</html>
 
