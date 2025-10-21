@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LankaBuy — Promotions</title>
+    <style>
+        body {
+            margin:0;
+            font-family: 'Inter', system-ui, Arial;
+            background:#0b1020;
+            color:#e7ecff;
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+        }
+
+        .wrap {
+            flex:1;
+            width:95%;
+            max-width:1600px;
+            margin:0 auto;
+            padding:40px 26px;
+        }
+
+        .top {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:40px;
+        }
+        h1 {
+            font-size:2.4rem;
+            font-weight:800;
+            margin:0;
+            background:linear-gradient(90deg,#60a5fa,#a78bfa);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            flex-grow:1;
+            text-align:left;
+        }
+        .actions {
+            display:flex;
+            gap:14px;
+            justify-content:flex-end;
+        }
+
+        .btn {
+            padding:10px 18px;
+            border-radius:999px;
+            border:none;
+            background:linear-gradient(90deg,#3b82f6,#8b5cf6);
+            color:white;
+            font-weight:600;
+            font-size:14px;
+            cursor:pointer;
+            text-decoration:none;
+            display:flex;
+            align-items:center;
+            gap:6px;
+            transition:all .25s ease;
+            box-shadow:0 4px 12px rgba(0,0,0,.3);
+        }
+        .btn:hover {
+            transform:translateY(-2px);
+            box-shadow:0 6px 18px rgba(0,0,0,.45);
+        }
+        .btn.logout {
+            background:linear-gradient(90deg,#f43f5e,#e11d48);
+        }
+
+        .promos {
+            display:grid;
+            grid-template-columns:repeat(auto-fill, minmax(480px,1fr));
+            gap:32px;
+            justify-items:stretch;
+        }
+
+        .card {
+            position:relative;
+            border-radius:16px;
+            overflow:hidden;
+            box-shadow:0 8px 20px rgba(0,0,0,.35);
+            transition:transform .25s ease, box-shadow .25s ease;
+            background:#111736;
+            min-height:280px;
+            cursor:pointer;
+        }
+        .card:hover {
+            transform:translateY(-6px);
+            box-shadow:0 12px 28px rgba(0,0,0,.45);
+        }
+        .card img {
+            width:100%;
+            height:240px;
+            object-fit:cover;
+            display:block;
+        }
+        .overlay {
+            position:absolute;
+            inset:0;
+            background:linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0.05));
+            display:flex;
+            flex-direction:column;
+            justify-content:flex-end;
+            padding:20px;
+            color:white;
+        }
+        .overlay h3 {
+            margin:0;
+            font-size:1.4rem;
+            font-weight:700;
+        }
+        .discount {
+            display:inline-block;
+            margin-top:10px;
+            padding:6px 12px;
+            border-radius:20px;
+            background:linear-gradient(90deg,#34d399,#059669);
+            color:#0b1020;
+            font-weight:600;
+            font-size:0.9rem;
+        }
+
+        /* Modal Popup */
+        .modal {
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.65);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            z-index:2000;
+        }
+        .modal.show { display:flex; }
+        .modal-content {
+            background:#111736;
+            border:1px solid rgba(255,255,255,.08);
+            border-radius:20px;
+            max-width:860px;
+            width:92%;
+            padding:28px;
+            color:#fff;
+            box-shadow:0 10px 30px rgba(0,0,0,.45);
+            animation:fadeIn .18s ease;
+        }
+        .modal-content img {
+            width:100%;
+            max-height:420px;
+            object-fit:cover;
+            border-radius:14px;
+            margin:16px 0;
+        }
+        .modal-top {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+        }
+        .close-btn {
+            background:#f43f5e;
+            color:white;
+            border:none;
+            border-radius:999px;
+            padding:8px 14px;
+            cursor:pointer;
+        }
+        .meta {
+            display:flex;
+            gap:12px;
+            align-items:center;
+            margin:14px 0;
+            flex-wrap:wrap;
+        }
+        .badge {
+            padding:6px 12px;
+            border-radius:20px;
+            font-weight:600;
+            font-size:0.9rem;
+        }
+        .discount-badge {
+            background:linear-gradient(90deg,#34d399,#059669);
+            color:#0b1020;
+        }
+        .promo-badge {
+            background:linear-gradient(90deg,#facc15,#f59e0b);
+            color:#0b1020;
+        }
+        .days-badge {
+            background:linear-gradient(90deg,#60a5fa,#3b82f6);
+            color:#fff;
+        }
+        .progress-container {
+            width:100%;
+            background:#1f2937;
+            border-radius:10px;
+            height:14px;
+            overflow:hidden;
+            margin:12px 0 18px;
+        }
+        .progress-bar {
+            height:100%;
+            width:0;
+            background:linear-gradient(90deg,#3b82f6,#8b5cf6);
+            transition:width .4s ease;
+        }
+
+        /* NEW: CTA button for the popout */
+        .cta-btn {
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding:10px 16px;
+            border-radius:999px;
+            background:linear-gradient(90deg,#22c55e,#16a34a);
+            color:#0b1020;
+            font-weight:800;
+            text-decoration:none;
+            box-shadow:0 6px 16px rgba(0,0,0,.35);
+            transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
+        }
+        .cta-btn:hover {
+            transform:translateY(-1px);
+            box-shadow:0 10px 22px rgba(0,0,0,.45);
+            filter:brightness(1.05);
+        }
+
+        @keyframes fadeIn {
+            from {opacity:0; transform:scale(.98);}
+            to {opacity:1; transform:scale(1);}
+        }
+
+        footer {
+            text-align:center;
+            padding:20px;
+            color:#9ca3af;
+            margin-top:auto;
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="top">
+        <h1>LankaBuy Promotions</h1>
+        <div class="actions">
+            <a href="/admin/promotions" class="btn" sec:authorize="hasRole('ADMIN')">⚙ Admin</a>
+            <a th:href="@{/promotions_login}" class="btn" sec:authorize="!isAuthenticated()">🔑 Login</a>
+            <a th:href="@{/logout}" class="btn logout" sec:authorize="isAuthenticated()">🚪 Logout</a>
+        </div>
+    </div>
+
+    <div class="promos">
+        <div class="card"
+             th:each="p : ${promotions}"
+             th:attr="data-id=${p.id},
+                      data-name=${p.name},
+                      data-description=${p.description},
+                      data-discount=${p.discountPercent},
+                      data-promocode=${p.promoCode},
+                      data-start=${p.startDate},
+                      data-end=${p.endDate},
+                      data-imgurl=${p.bannerImage != null ? '/promotions/' + p.id + '/image' : p.bannerImageUrl},
+                      data-link=${p.bannerImageUrl}"> <!-- NEW: use bannerImageUrl as landing link -->
+            <!-- DB BLOB image -->
+            <img th:if="${p.bannerImage != null}"
+                 th:src="@{'/promotions/' + ${p.id} + '/image'}"
+                 alt="Promo banner">
+            <!-- URL image -->
+            <img th:if="${p.bannerImage == null and p.bannerImageUrl != null}"
+                 th:src="${p.bannerImageUrl}"
+                 alt="Promo banner">
+
+            <div class="overlay">
+                <h3 th:text="${p.name}">Promo Title</h3>
+                <span class="discount" th:if="${p.discountPercent != null}"
+                      th:text="${p.discountPercent + '% OFF'}">20% OFF</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hover Preview Modal -->
+<div class="modal" id="promoModal">
+    <div class="modal-content" id="promoModalContent">
+        <div class="modal-top">
+            <h2 id="modalTitle" style="margin:0;"></h2>
+            <button class="close-btn" onclick="hideModal()">✖</button>
+        </div>
+        <div class="meta">
+            <span class="badge discount-badge" id="modalDiscount"></span>
+            <span class="badge promo-badge" id="modalCode"></span>
+            <span class="badge days-badge" id="modalDays"></span>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" id="modalProgress"></div>
+        </div>
+        <img id="modalImg" src="" alt="Promotion Image">
+        <p id="modalDesc" style="margin:8px 0 10px; line-height:1.5;"></p>
+
+        <!-- NEW: CTA button (hidden if no link) -->
+        <div id="modalCtaWrap" style="margin-top:10px; display:none;">
+            <a id="modalCta" class="cta-btn" href="#" target="_blank" rel="noopener">View Deal →</a>
+        </div>
+    </div>
+</div>
+
+<footer>
+    © 2025 LankaBuy — Marketing & Promotions
+</footer>
+
+<script>
+    (() => {
+        const modal = document.getElementById('promoModal');
+        const modalContent = document.getElementById('promoModalContent');
+        const modalImg = document.getElementById('modalImg');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalDiscount = document.getElementById('modalDiscount');
+        const modalCode = document.getElementById('modalCode');
+        const modalDays = document.getElementById('modalDays');
+        const modalProgress = document.getElementById('modalProgress');
+
+        // NEW: CTA
+        const modalCtaWrap = document.getElementById('modalCtaWrap');
+        const modalCta = document.getElementById('modalCta');
+
+        let hideTimer = null;
+        let currentCard = null;
+
+        function daysRemaining(startDate, endDate) {
+            if (!endDate) return "No end date";
+            const today = new Date();
+            const start = startDate ? new Date(startDate) : today;
+            const end = new Date(endDate);
+            const diff = Math.ceil((end - today) / (1000 * 60 * 60 * 24));
+            if (diff < 0) return "Expired";
+            if (diff === 0) return "Ends today!";
+            return diff + " days remaining";
+        }
+
+        function progressPercent(startDate, endDate) {
+            if (!startDate || !endDate) return 0;
+            const today = new Date();
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            if (today < start) return 0;
+            if (today > end) return 100;
+            return Math.round(((today - start) / (end - start)) * 100);
+        }
+
+        function showModalFromCard(card) {
+            currentCard = card;
+            modalImg.src = card.dataset.imgurl || '';
+            modalTitle.textContent = card.dataset.name || '';
+            modalDesc.textContent = card.dataset.description || '';
+            modalDiscount.textContent = card.dataset.discount ? (card.dataset.discount + '% OFF') : '';
+            modalCode.textContent = card.dataset.promocode ? ('Code: ' + card.dataset.promocode) : '';
+            modalDays.textContent = daysRemaining(card.dataset.start, card.dataset.end);
+            modalProgress.style.width = progressPercent(card.dataset.start, card.dataset.end) + "%";
+
+            // NEW: set CTA link (show only if we have a link)
+            const link = card.dataset.link;
+            if (link && link.trim() !== '') {
+                modalCta.href = link;
+                modalCtaWrap.style.display = 'block';
+            } else {
+                modalCta.href = '#';
+                modalCtaWrap.style.display = 'none';
+            }
+
+            modal.classList.add('show');
+        }
+
+        function scheduleHide() {
+            clearTimeout(hideTimer);
+            hideTimer = setTimeout(() => {
+                if (!modal.matches(':hover') && !(currentCard && currentCard.matches(':hover'))) {
+                    modal.classList.remove('show');
+                    currentCard = null;
+                }
+            }, 200);
+        }
+
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                clearTimeout(hideTimer);
+                showModalFromCard(card);
+            });
+            card.addEventListener('mouseleave', () => scheduleHide());
+        });
+
+        modalContent.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+        modalContent.addEventListener('mouseleave', () => scheduleHide());
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+                currentCard = null;
+            }
+        });
+
+        window.hideModal = () => {
+            modal.classList.remove('show');
+            currentCard = null;
+        };
+    })();
+</script>
+</body>
+</html>
