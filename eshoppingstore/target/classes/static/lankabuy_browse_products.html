@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LankaBuy - Browse Products</title>
+    <link rel="stylesheet" href="browseProducts.css">
+    <script src="auth.js"></script>
+</head>
+<body>
+<!-- TOP NAVIGATION -->
+<nav class="top-nav">
+    <a href="#" class="logo">
+        <div class="icon">🛒</div>
+        LankaBuy
+    </a>
+
+    <div class="nav-buttons">
+        <button class="nav-btn cart-btn">
+            🛒 Cart (0)
+        </button>
+        <button class="nav-btn login-btn">
+            Login
+        </button>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h1 class="page-title">Browse Products</h1>
+        <div class="controls">
+            <input
+                    type="text"
+                    class="search-box"
+                    id="searchBox"
+                    placeholder="Search products..."
+                    onkeyup="searchProducts()"
+            >
+            <select class="filter-select" id="categoryFilter" onchange="filterByCategory()">
+                <option value="">All Categories</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Books">Books</option>
+                <option value="Home">Home & Garden</option>
+                <option value="Sports">Sports</option>
+                <option value="Beauty">Beauty</option>
+                <option value="Toys">Toys</option>
+                <option value="Food">Food & Beverages</option>
+                <option value="Automotive">Automotive</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- PRODUCTS COUNT -->
+    <div class="products-count" id="productsCount" style="display: none;">
+        <div class="count-text">
+            Showing <strong id="productCountNumber">0</strong> products
+        </div>
+    </div>
+
+    <!-- PRODUCTS GRID -->
+    <div id="productsContainer">
+        <div class="loading">
+            <div class="spinner"></div>
+            Loading products...
+        </div>
+    </div>
+</div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div class="modal" id="productModal">
+    <div class="modal-content">
+        <button class="close-modal" onclick="closeModal()">×</button>
+        <img src="" alt="" class="modal-image" id="modalImage">
+        <div class="modal-body">
+            <div class="modal-category" id="modalCategory"></div>
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <div class="modal-price" id="modalPrice"></div>
+            <p class="modal-description" id="modalDescription"></p>
+            <div class="modal-actions">
+                <button class="action-btn add-cart-btn" onclick="addToCart()">
+                    Add to Cart
+                </button>
+                <button class="action-btn view-btn" onclick="closeModal()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="browseProducts.js"></script>
+
+</body>
+</html>

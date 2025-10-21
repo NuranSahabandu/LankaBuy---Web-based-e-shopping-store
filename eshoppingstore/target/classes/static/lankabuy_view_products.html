@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LankaBuy - All Products</title>
+    <link rel="stylesheet" href="viewProduct.css">
+    <script src="auth.js"></script>
+
+</head>
+<body>
+<!-- TOP NAVIGATION -->
+<nav class="top-nav">
+    <a href="#" class="logo">
+        <div class="icon">🛒</div>
+        LankaBuy
+    </a>
+
+    <div class="nav-buttons">
+        <button class="nav-btn add-btn" onclick="goToAddProduct()">
+            ➕ Add New Product
+        </button>
+        <button class="nav-btn update-btn" onclick="goToUpdateProduct()">
+            ✏️ Update Product
+        </button>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h1 class="page-title">All Products</h1>
+        <div class="controls">
+            <input
+                    type="text"
+                    class="search-box"
+                    id="searchBox"
+                    placeholder="Search products..."
+                    onkeyup="searchProducts()"
+            >
+            <button class="refresh-btn" onclick="loadAllProducts()">
+                🔄 Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- DELETE BY ID SECTION -->
+    <div class="delete-by-id-section">
+        <h2 class="delete-by-id-title">🗑️ Delete Product by ID</h2>
+        <div class="delete-by-id-form">
+            <input
+                    type="text"
+                    class="delete-id-input"
+                    id="deleteProductIdInput"
+                    placeholder="Enter Product ID (e.g., P001)"
+            >
+            <button class="delete-id-btn" onclick="deleteProductById()">
+                Delete Product
+            </button>
+        </div>
+    </div>
+
+    <!-- PRODUCTS COUNT -->
+    <div class="products-count" id="productsCount" style="display: none;">
+        <div class="count-text">
+            Showing <strong id="productCountNumber">0</strong> products
+        </div>
+    </div>
+
+    <!-- PRODUCTS GRID -->
+    <div id="productsContainer">
+        <div class="loading">
+            <div class="spinner"></div>
+            Loading products...
+        </div>
+    </div>
+</div>
+<script>
+    // Protect admin page
+    document.addEventListener('DOMContentLoaded', async function() {
+        await Auth.requireAdmin();
+    });
+</script>
+
+<script src="viewProducts.js"></script>
+<script src="auth.js"></script>
+
+</body>
+</html>

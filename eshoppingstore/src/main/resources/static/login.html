@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LankaBuy - Login</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <h1>LankaBuy</h1>
+            <p>Your Trusted Shopping Partner</p>
+        </div>
+        <nav class="nav-buttons">
+            <button onclick="window.location.href='register.html'" class="nav-btn">Sign Up</button>
+            <button onclick="window.location.href='lankabuy_browse_products.html'" class="nav-btn">Browse Products</button>
+        </nav>
+    </header>
+
+    <!-- Login Form -->
+    <div class="form-container">
+        <div class="form-header">
+            <h2>Welcome Back!</h2>
+            <p>Login to your LankaBuy account</p>
+        </div>
+
+        <form id="loginForm" class="login-form">
+            <div class="form-group">
+                <label for="usernameOrEmail">Username or Email *</label>
+                <input type="text" id="usernameOrEmail" name="usernameOrEmail" required
+                       placeholder="Enter your username or email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password *</label>
+                <input type="password" id="password" name="password" required
+                       placeholder="Enter your password">
+            </div>
+
+            <div class="form-options">
+                <div class="remember-me">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">Remember me</label>
+                </div>
+                <a href="#" class="forgot-password">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+
+        <div class="register-link">
+            <p>Don't have an account? <a href="register.html">Create one here</a></p>
+        </div>
+
+        <!-- Demo Login Section -->
+        <div class="demo-section">
+            <h3>Demo Accounts</h3>
+            <div class="demo-buttons">
+                <button type="button" class="demo-btn" onclick="fillDemoAdmin()">Demo Admin</button>
+                <button type="button" class="demo-btn" onclick="fillDemoCustomer()">Demo Customer</button>
+            </div>
+            <p class="demo-note">Use these for quick testing</p>
+        </div>
+    </div>
+
+    <!-- Success/Error Message -->
+    <div id="messageContainer" class="message-container" style="display: none;">
+        <div id="messageContent" class="message-content"></div>
+    </div>
+</div>
+
+<script src="login.js"></script>
+</body>
+</html>

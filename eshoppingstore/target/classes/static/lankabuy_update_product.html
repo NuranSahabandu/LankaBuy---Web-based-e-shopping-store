@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LankaBuy - Update Product</title>
+    <link rel="stylesheet" href="updateProduct.css">
+</head>
+<body>
+<nav class="top-nav">
+    <a href="#" class="logo">
+        <div class="icon">🛒</div>
+        LankaBuy
+    </a>
+
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="goToViewProducts()">
+            Back to Products
+        </button>
+    </div>
+</nav>
+
+<main class="main-content">
+    <div class="update-container">
+        <div class="form-header">
+            <h1 class="form-title">Update Product</h1>
+            <p class="form-subtitle">Search for a product by ID and update its information</p>
+        </div>
+
+        <div class="search-section">
+            <h3 class="search-title">Search Product by ID</h3>
+            <div class="search-form">
+                <input
+                        type="text"
+                        class="search-input"
+                        id="searchProductId"
+                        placeholder="Enter Product ID (e.g., P001)"
+                >
+                <button class="search-btn" onclick="searchProduct()">
+                    Search Product
+                </button>
+            </div>
+        </div>
+
+        <form class="update-form" id="updateForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">🔖</span>
+                        Product ID <span class="required">*</span>
+                    </label>
+                    <input
+                            type="text"
+                            id="productId"
+                            class="form-input"
+                            readonly
+                            style="background: #f8f9fa; cursor: not-allowed;"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">📝</span>
+                        Product Name <span class="required">*</span>
+                    </label>
+                    <input
+                            type="text"
+                            id="productName"
+                            class="form-input"
+                            placeholder="e.g., Samsung Galaxy S24"
+                            required
+                    >
+                    <div class="validation-message" id="productNameError"></div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">🏷️</span>
+                        Category <span class="required">*</span>
+                    </label>
+                    <select id="productCategory" class="form-select" required>
+                        <option value="">Select Category</option>
+                        <option value="Electronics">📱 Electronics</option>
+                        <option value="Clothing">👕 Clothing</option>
+                        <option value="Books">📚 Books</option>
+                        <option value="Home">🏠 Home & Garden</option>
+                        <option value="Sports">⚽ Sports</option>
+                        <option value="Beauty">💄 Beauty</option>
+                        <option value="Toys">🧸 Toys</option>
+                        <option value="Food">🍕 Food & Beverages</option>
+                        <option value="Automotive">🚗 Automotive</option>
+                        <option value="Other">📦 Other</option>
+                    </select>
+                    <div class="validation-message" id="categoryError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">💰</span>
+                        Price (LKR) <span class="required">*</span>
+                    </label>
+                    <div class="price-input-group">
+                        <span class="currency-symbol">Rs.</span>
+                        <input
+                                type="number"
+                                id="productPrice"
+                                class="form-input price-input"
+                                placeholder="0.00"
+                                step="0.01"
+                                min="0"
+                                required
+                        >
+                    </div>
+                    <div class="validation-message" id="priceError"></div>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label class="form-label">
+                    <span class="label-icon">📄</span>
+                    Product Description <span class="required">*</span>
+                </label>
+                <textarea
+                        id="productDescription"
+                        class="form-textarea"
+                        placeholder="Enter detailed product description..."
+                        maxlength="500"
+                        required
+                ></textarea>
+                <div class="character-counter">
+                    <span id="charCount">0</span> / 500 characters
+                </div>
+                <div class="validation-message" id="descriptionError"></div>
+            </div>
+
+            <div class="form-group full-width">
+                <label class="form-label">
+                    <span class="label-icon">🔗</span>
+                    Image URL
+                </label>
+                <input
+                        type="url"
+                        id="productImageUrl"
+                        class="form-input"
+                        placeholder="https://example.com/image.jpg"
+                >
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="cancel-btn" onclick="cancelUpdate()">
+                    Cancel
+                </button>
+                <button type="submit" class="update-btn" id="submitBtn">
+                    <span class="btn-text">Update Product</span>
+                    <div class="loading"></div>
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<script src="updateProducts.js">
+</script>
+</body>
+</html>
