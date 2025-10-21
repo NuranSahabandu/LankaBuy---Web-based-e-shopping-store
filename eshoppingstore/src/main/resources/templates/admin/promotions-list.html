@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Admin — Promotions</title>
+    <style>
+        body {
+            margin:0;
+            font-family:Inter,system-ui,Arial;
+            background:#0b1020;
+            color:#e7ecff;
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+        }
+        .wrap { flex:1; max-width:1100px; margin:0 auto; padding:26px }
+        .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px }
+        .btn {
+            padding:10px 14px;
+            border-radius:10px;
+            border:1px solid rgba(255,255,255,.12);
+            background:#121936;
+            cursor:pointer;
+            text-decoration:none;
+            color:#e7ecff;
+            font-size:14px;
+        }
+        .btn:hover { filter:brightness(1.15) }
+        table {
+            width:100%;
+            border-collapse:collapse;
+            background:#0f152a;
+            border:1px solid rgba(255,255,255,.08);
+            border-radius:12px;
+            overflow:hidden;
+            margin-top:20px;
+        }
+        th,td {
+            padding:12px;
+            border-bottom:1px solid rgba(255,255,255,.06);
+            text-align:left;
+        }
+        th { background:#0f1734 }
+        .muted { opacity:.8 }
+        .actions form { display:inline }
+        .pill {
+            padding:4px 8px;
+            border-radius:999px;
+            background:rgba(110,231,255,.12);
+            border:1px solid rgba(110,231,255,.3);
+        }
+        footer {
+            text-align:center;
+            padding:20px;
+            color:#9ca3af;
+            margin-top:auto;
+        }
+
+        /* --- Modal Styling --- */
+        .modal {
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.65);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            z-index:1000;
+        }
+        .modal.show { display:flex }
+        .card {
+            background:linear-gradient(180deg,#111736,#0f152a);
+            border:1px solid rgba(255,255,255,.08);
+            border-radius:16px;
+            box-shadow:0 10px 30px rgba(0,0,0,.25);
+            width:min(650px,95vw);
+            padding:24px;
+        }
+        .grid {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:16px;
+        }
+        .grid label { font-size:13px; opacity:.85; margin-bottom:6px }
+        input,textarea {
+            width:100%;
+            padding:10px;
+            border-radius:10px;
+            background:#131938;
+            border:1px solid rgba(255,255,255,.12);
+            color:#e7ecff;
+            box-sizing:border-box;
+        }
+        textarea { min-height:80px }
+        .full { grid-column:1 / -1 }
+        .row { display:flex; gap:10px; justify-content:flex-end; margin-top:16px }
+
+        /* Pill Toggle Button */
+        .toggle-btn {
+            padding:8px 16px;
+            border:none;
+            border-radius:20px;
+            background:#444a66;
+            color:#fff;
+            cursor:pointer;
+            font-weight:600;
+            transition:all 0.3s;
+        }
+        .toggle-btn.active {
+            background:linear-gradient(90deg,#34d399,#059669);
+            color:#0b1020;
+        }
+    </style>
+    <script>
+        function openModal(){document.getElementById('modal').classList.add('show');}
+        function closeModal(){document.getElementById('modal').classList.remove('show');}
+
+        function previewBanner(url){
+            const img=document.getElementById('bannerPreview');
+            if(url && url.startsWith('http')){ img.src=url; img.style.display='block'; }
+            else { img.style.display='none'; }
+        }
+
+        function toggleActive(btn){
+            const hidden=btn.nextElementSibling;
+            if(btn.classList.contains("active")){
+                btn.classList.remove("active");
+                btn.textContent="Inactive";
+                hidden.value="false";
+            } else {
+                btn.classList.add("active");
+                btn.textContent="Active";
+                hidden.value="true";
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="wrap">
+    <div class="top">
+        <h1>Promotions</h1>
+        <div>
+            <a href="/Promotions" class="btn">← Back to promotions</a>
+            <button class="btn" onclick="openModal()">+ New Promotion</button>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Code</th>
+            <th>Discount</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${promotions}">
+            <td th:text="${p.id}">1</td>
+            <td th:text="${p.name}">Sample</td>
+            <td><span class="muted" th:text="${p.promoCode != null ? p.promoCode : '—'}">—</span></td>
+            <td th:text="${p.discountPercent != null ? p.discountPercent + '%' : '—'}">—</td>
+            <td th:text="${p.startDate != null ? p.startDate : '—'}">—</td>
+            <td th:text="${p.endDate != null ? p.endDate : '—'}">—</td>
+            <td><span class="pill" th:text="${p.active} ? 'ACTIVE' : 'INACTIVE'">ACTIVE</span></td>
+            <td th:text="${p.priority != null ? p.priority : 0}">0</td>
+
+            <!-- Show image thumbnail -->
+            <td>
+                <img th:if="${p.bannerImage != null}"
+                     th:src="@{'/admin/promotions/' + ${p.id} + '/image'}"
+                     alt="Banner" style="max-height:60px; border-radius:6px;" />
+                <img th:if="${p.bannerImage == null and p.bannerImageUrl != null}"
+                     th:src="${p.bannerImageUrl}"
+                     alt="Banner" style="max-height:60px; border-radius:6px;" />
+            </td>
+
+            <td class="actions">
+                <a class="btn" th:href="@{'/admin/promotions/' + ${p.id} + '/edit'}">Edit</a>
+                <form th:action="@{'/admin/promotions/' + ${p.id} + '/toggle'}" method="post">
+                    <button class="btn" type="submit" th:text="${p.active} ? 'Deactivate' : 'Activate'">Toggle</button>
+                </form>
+                <form th:action="@{'/admin/promotions/' + ${p.id} + '/delete'}" method="post"
+                      onsubmit="return confirm('Delete this promotion?')">
+                    <button class="btn" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- New Promotion Modal -->
+<div class="modal" id="modal" aria-hidden="true">
+    <div class="card">
+        <h2 style="margin-top:0">New Promotion</h2>
+        <!-- enctype added -->
+        <form th:action="@{'/admin/promotions'}" th:object="${promotion}" method="post" enctype="multipart/form-data">
+            <div class="grid">
+                <div><label>Name</label><input type="text" th:field="*{name}" required /></div>
+                <div><label>Promo Code (optional)</label><input type="text" th:field="*{promoCode}" /></div>
+                <div><label>Discount %</label><input type="number" th:field="*{discountPercent}" min="0" max="100" /></div>
+                <div><label>Priority</label><input type="number" th:field="*{priority}" min="1" max="5" required/></div>
+                <div><label>Start Date</label><input type="date" th:field="*{startDate}" /></div>
+                <div><label>End Date</label><input type="date" th:field="*{endDate}" /></div>
+
+                <!-- File Upload -->
+                <div class="full">
+                    <label>Upload Banner Image</label>
+                    <input type="file" name="imageFile" accept="image/*" />
+                </div>
+
+                <!-- URL Fallback -->
+                <div class="full">
+                    <label>Or Banner Image URL</label>
+                    <input type="url" th:field="*{bannerImageUrl}" placeholder="https://..." oninput="previewBanner(this.value)" />
+                    <img id="bannerPreview" style="max-width:100%;margin-top:10px;display:none;border-radius:10px;">
+                </div>
+
+                <div class="full"><label>Description</label><textarea th:field="*{description}"></textarea></div>
+                <div class="full">
+                    <label>Active?</label>
+                    <button type="button" class="toggle-btn" onclick="toggleActive(this)">Inactive</button>
+                    <input type="hidden" th:field="*{active}" value="false" />
+                </div>
+            </div>
+            <div class="row">
+                <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer>
+    © 2025 LankaBuy — Marketing & Promotions
+</footer>
+</body>
+</html>
