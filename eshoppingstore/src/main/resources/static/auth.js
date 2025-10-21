@@ -84,22 +84,34 @@ class Auth {
         if (user) {
             // User is logged in
             navButtons.innerHTML = `
-                <span class="user-welcome">Welcome, ${user.fullName || user.username}!</span>
-                ${user.role === 'ADMIN' ? '<button onclick="window.location.href=\'lankabuy_view_products.html\'" class="nav-btn">Admin Panel</button>' +
-                '<button class="nav-btn add-btn" onclick="goToAddProduct()">\n            ➕ Add New Product\n            </button>\n            <button class="nav-btn update-btn" onclick="goToUpdateProduct()">\n            ✏️ Update Product\n        </button>' : ''}
-                
-                
-                <button onclick="Auth.logout()" class="nav-btn logout-btn">Logout</button>
-            `;
+            <span class="user-welcome">Welcome, ${user.fullName || user.username}!</span>
+
+            <!-- ✅ Always show Promotions -->
+            <button onclick="window.location.href='/Promotions'" class="nav-btn promo-btn">🎉 Promotions</button>
+
+            ${user.role === 'ADMIN'
+                ? `
+                   <button onclick="window.location.href='lankabuy_view_products.html'" class="nav-btn">Admin Panel</button>
+                   <button class="nav-btn add-btn" onclick="goToAddProduct()">➕ Add New Product</button>
+                   <button class="nav-btn update-btn" onclick="goToUpdateProduct()">✏️ Update Product</button>
+                  `
+                : ''
+            }
+
+            <button onclick="Auth.logout()" class="nav-btn logout-btn">Logout</button>
+        `;
         } else {
             // User is not logged in
             navButtons.innerHTML = `
-                <button onclick="window.location.href='login.html'" class="nav-btn">Login</button>
-                <button onclick="window.location.href='register.html'" class="nav-btn">Sign Up</button>
-                <button onclick="window.location.href='browseProducts.html'" class="nav-btn">Browse</button>
-            `;
+            <!-- ✅ Always show Promotions -->
+            <button onclick="window.location.href='/Promotions'" class="nav-btn promo-btn">🎉 Promotions</button>
+            <button onclick="window.location.href='login.html'" class="nav-btn">Login</button>
+            <button onclick="window.location.href='register.html'" class="nav-btn">Sign Up</button>
+            <button onclick="window.location.href='browseProducts.html'" class="nav-btn">Browse</button>
+        `;
         }
     }
+
 
     // Show login status message
     static showAuthMessage(message, type = 'info') {
